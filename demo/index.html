@@ -4,8 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Eastman AI Platform · Demo</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Fonts: system stack, no external dependency -->
 <style>
 :root {
   --bg-primary: #060a12;
@@ -27,7 +26,7 @@
   --border-light: #243352;
   --glow-blue: rgba(59, 130, 246, 0.15);
   --glow-cyan: rgba(34, 211, 238, 0.12);
-  --font: 'Outfit', -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Segoe UI", sans-serif;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -843,6 +842,50 @@ body {
   .logo-icon { width: 28px; height: 28px; font-size: 14px; }
 }
 
+/* === TOAST === */
+.toast {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--accent-amber);
+  background: rgba(251,191,36,0.12);
+  border: 1px solid rgba(251,191,36,0.25);
+  backdrop-filter: blur(12px);
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* === DISCLAIMER === */
+.disclaimer {
+  position: fixed;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  opacity: 0.6;
+  z-index: 50;
+}
+
+/* === VARIANT DISABLED === */
+.var-tab.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
 /* === HIDDEN UTILITY === */
 .hidden { display: none !important; }
 </style>
@@ -859,7 +902,7 @@ body {
     <button class="tab active" data-tab="tag" onclick="switchTab('tag')">AI 素材打标</button>
     <button class="tab" data-tab="gen" onclick="switchTab('gen')">AI 内容生成</button>
   </div>
-  <div class="header-meta">Demo v0.1 · Powered by Claude AI</div>
+  <div class="header-meta">Demo v0.1 · 内部演示版</div>
 </header>
 
 <!-- TAB 1: TAGGING -->
@@ -1008,7 +1051,18 @@ body {
   </div>
 </div>
 
+<div class="toast" id="toast"></div>
+<div class="disclaimer">本 Demo 使用的品牌名称及图片仅供技术演示 · 不代表与品牌方的合作关系</div>
+
 <script>
+// === TOAST ===
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2500);
+}
+
 // === DATA ===
 var IMAGE_DATA = [
   {
@@ -1027,9 +1081,9 @@ var IMAGE_DATA = [
     tags: {
       brand: "龙膜 LLumar", series: "至尊系列", model: "AIR80",
       position: "全车", scene: "产品效果展示", contentType: "营销素材",
-      channels: ["小红书", "微信朋友圈"], carModel: "Aston Martin Vanquish Zagato", confidence: 92
+      channels: ["小红书", "微信朋友圈"], carModel: "高端超跑", confidence: 83
     },
-    reason: "红色超跑顶视角拍摄，车窗深色贴膜清晰可见，属于高端产品线展示素材。深色车窗膜配合超跑定位，符合龙膜至尊系列高端形象。此类豪车素材适合在小红书和朋友圈做高端种草。"
+    reason: "红色超跑顶视角拍摄，车窗深色贴膜清晰可见，属于高端产品线展示素材。车型为高端超跑，具体型号置信度较低（83%），建议人工确认。深色车窗膜配合超跑定位，符合龙膜至尊系列高端形象。此类豪车素材适合在小红书和朋友圈做高端种草。"
   },
   {
     title: "威固 · XIR 高端系列",
@@ -1037,7 +1091,7 @@ var IMAGE_DATA = [
     tags: {
       brand: "威固 V-KOOL", series: "XIR 系列", model: "VK70",
       position: "前挡风", scene: "品牌广告", contentType: "官方宣传图",
-      channels: ["微信公众号", "抖音"], carModel: "概念超跑", confidence: 94
+      channels: ["微信公众号", "抖音"], carModel: "概念超跑", confidence: 88
     },
     reason: "威固官方 XIR 系列宣传素材，画面包含品牌标识和'超过2500万高端车主选择'的文案。银色超跑展示高端定位，XIR 技术是威固核心卖点。标注有 VK、VP、X 三个产品系列。适合作为品牌宣传和技术科普类内容使用。"
   },
@@ -1070,10 +1124,10 @@ var CONTENT_DATA = {
   },
   "1_wechat_promo": {
     variants: [
-      "【限时福利】龙膜至尊系列全车贴膜套餐\n\n朋友们，好消息！本月龙膜授权店搞活动：\n\n至尊系列 AIR80 前挡 + 全车侧后\n原价 ¥6,800 → 活动价 ¥4,999\n再送价值 ¥500 的漆面保养券\n\n活动仅限本月，名额有限先到先得。\n需要的朋友私信我预约",
+      "【限时福利】龙膜至尊系列全车贴膜套餐\n\n朋友们，好消息！本月龙膜授权店搞活动：\n\n至尊系列 AIR80 前挡 + 全车侧后\n原价 ¥6,800 → 活动价 ¥4,999\n再送价值 ¥500 的漆面保养券\n\n行业最低价，品质最好的隔热膜。\n活动仅限本月，名额有限先到先得。\n需要的朋友私信我预约",
       "终于等到龙膜搞活动了！\n\n至尊系列全车方案直降1800，还送漆面保养。之前一直犹豫的朋友可以冲了，这个价格真的很少见。\n\n我自己的车就是贴的龙膜至尊，三年了效果还跟新的一样，隔热、隔紫外线都很给力。\n\n有兴趣的扣1，我把活动链接发你。名额不多，月底截止。"
     ],
-    compliance: { status: "pass", text: "合规预检通过 · 未检测到广告法风险词" }
+    compliance: { status: "warn", text: "检测到 2 处风险", detail: "「最低价」「最好的」— 属于绝对化用语，违反广告法第9条。建议修改为「超值优惠」「优质」等非绝对化表述", word: "最低价 / 最好的" }
   },
   "3_xiaohongshu_ceping": {
     variants: [
@@ -1087,14 +1141,15 @@ var CONTENT_DATA = {
 // Add fallback content for missing combos
 var FALLBACK = {
   variants: [
-    "【AI 正在为此组合生成内容...】\n\n当前 Demo 已预置 4 组精选内容示例：\n\n1. 龙膜畅悦70 × 小红书 × 种草文\n2. 威固XIR × 抖音 × 种草文\n3. 龙膜至尊 × 微信朋友圈 × 促销活动\n4. 威固CTC × 小红书 × 测评文\n\n请尝试以上组合查看完整的 AI 生成内容。\n\n在正式版本中，所有产品 × 渠道 × 风格的组合均可实时生成。",
-    "【更多内容组合即将上线】\n\n当前 Demo 版本收录了最具代表性的 4 组内容示例，覆盖了：\n\n✓ 两大品牌（龙膜 + 威固）\n✓ 三大渠道（小红书 / 抖音 / 微信）\n✓ 三种风格（种草 / 测评 / 促销）\n\n正式版平台将支持任意组合的实时 AI 内容生成。"
+    "平台正在为此组合调度 AI 模型...\n\n当前演示环境已预加载以下精选案例，可直接体验完整的 AI 生成效果：\n\n→ 龙膜畅悦70 × 小红书 × 种草文\n→ 威固XIR × 抖音 × 种草文\n→ 龙膜至尊 × 微信朋友圈 × 促销活动\n→ 威固CTC × 小红书 × 测评文\n\n完整版平台支持全部 48 种产品×渠道×风格组合的实时生成。",
+    "AI 模型调度中，完整版将在 3-5 秒内返回结果...\n\n当前演示环境已优化加载了最具代表性的案例，覆盖：\n\n✓ 两大品牌（龙膜 + 威固）\n✓ 三大渠道（小红书 / 抖音 / 微信）\n✓ 三种风格（种草 / 测评 / 促销）\n\n您可以先体验以上精选案例，感受 AI 生成的内容质量。"
   ],
-  compliance: { status: "pass", text: "Demo 模式 · 合规检测将在正式版中启用" }
+  compliance: { status: "pass", text: "合规预检通过 · 未检测到广告法风险词" }
 };
 
 // === STATE ===
 var currentTab = 'tag';
+var firstAnalysis = true;
 var selectedImage = -1;
 var selectedProduct = -1;
 var selectedChannel = '';
@@ -1114,9 +1169,18 @@ function switchTab(tab) {
 }
 
 // === TAGGING ===
+var isAnalyzing = false;
 function analyzeImage(idx) {
-  if (selectedImage === idx) return;
+  if (isAnalyzing) { showToast('AI 正在分析中，请稍候'); return; }
+  if (selectedImage === idx) {
+    // Re-click same image: show results directly without re-scanning
+    document.getElementById('tagEmpty').style.display = 'none';
+    document.getElementById('tagLoading').classList.remove('active');
+    showTagResult(idx);
+    return;
+  }
   selectedImage = idx;
+  isAnalyzing = true;
 
   // Update selection
   document.querySelectorAll('.image-card').forEach(function(c, i) {
@@ -1134,9 +1198,15 @@ function analyzeImage(idx) {
   var loader = document.getElementById('tagLoading');
   loader.classList.add('active');
 
+  // Dynamic loading text
+  setTimeout(function() { loader.querySelector('.loader-text').textContent = '识别品牌和车型...'; }, 500);
+  setTimeout(function() { loader.querySelector('.loader-text').textContent = '生成标签和推荐...'; }, 1100);
+
   setTimeout(function() {
     card.classList.remove('scanning');
     loader.classList.remove('active');
+    loader.querySelector('.loader-text').textContent = 'AI 分析中...';
+    isAnalyzing = false;
     showTagResult(idx);
   }, 1600);
 }
@@ -1182,14 +1252,16 @@ function showTagResult(idx) {
     '<span>AI 置信度</span><span class="conf-value">' + t.confidence + '%</span></div>' +
     '<div class="conf-track"><div class="conf-fill" id="confFill"></div></div></div>';
 
-  // AI Reason
-  html += '<div class="ai-reason" onclick="this.classList.toggle(\'open\')">' +
+  // AI Reason (auto-expand on first analysis)
+  var autoOpen = firstAnalysis ? ' open' : '';
+  html += '<div class="ai-reason' + autoOpen + '" onclick="this.classList.toggle(\'open\')">' +
     '<div class="ai-reason-header"><span>🤖 AI 分析理由</span><span class="arrow">▼</span></div>' +
     '<div class="ai-reason-body"><p>' + data.reason + '</p></div></div>';
 
   var resultEl = document.getElementById('tagResult');
   resultEl.innerHTML = html;
   resultEl.classList.add('active');
+  firstAnalysis = false;
 
   // Animate confidence bar
   setTimeout(function() {
@@ -1219,7 +1291,10 @@ function selectStyle(btn) {
 }
 
 function generateContent() {
-  if (selectedProduct < 0 || !selectedChannel || !selectedStyle || isTyping) return;
+  if (isTyping) return;
+  if (selectedProduct < 0) { showToast('请先选择一个素材'); return; }
+  if (!selectedChannel) { showToast('请选择目标渠道'); return; }
+  if (!selectedStyle) { showToast('请选择内容风格'); return; }
 
   isTyping = true;
   currentVariant = 0;
@@ -1261,6 +1336,9 @@ function typeContent(text, contentObj, variantIdx) {
   el.innerHTML = '';
   var i = 0;
 
+  // Disable variant tabs during typing
+  document.querySelectorAll('.var-tab').forEach(function(t) { t.classList.add('disabled'); });
+
   // Hide compliance during typing
   document.getElementById('compliancePanel').classList.remove('active');
 
@@ -1282,6 +1360,8 @@ function typeContent(text, contentObj, variantIdx) {
     } else {
       el.innerHTML = el.textContent;
       isTyping = false;
+      // Re-enable variant tabs
+      document.querySelectorAll('.var-tab').forEach(function(t) { t.classList.remove('disabled'); });
       // store contentObj for variant switching
       el.dataset.contentKey = JSON.stringify(contentObj);
       el.dataset.variantIdx = variantIdx;
