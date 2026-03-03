@@ -1037,7 +1037,7 @@
   <div class="slide" id="slide-7">
     <div class="section-num">07 / Architecture</div>
     <div class="section-title">技术架构</div>
-    <div class="section-desc">云原生架构，弹性扩展，按量付费</div>
+    <div class="section-desc">全球最优模型组合，云原生架构，弹性扩展</div>
 
     <div class="arch-visual">
       <!-- 用户层 -->
@@ -1081,10 +1081,10 @@
       <div class="arch-layer">
         <div class="arch-layer-label l-ai">AI 层</div>
         <div class="arch-layer-content l-ai">
-          <span class="arch-chip"><span class="chip-icon">&#128065;</span> 多模态理解</span>
-          <span class="arch-chip"><span class="chip-icon">&#128269;</span> 向量检索 (RAG)</span>
-          <span class="arch-chip"><span class="chip-icon">&#9997;</span> 内容生成 (LLM)</span>
-          <span class="arch-chip" style="border-color:rgba(16,185,129,0.4);"><span class="chip-icon">&#11088;</span> 灵活对接主流大模型</span>
+          <span class="arch-chip"><span class="chip-icon">&#129504;</span> Claude Sonnet (视觉+生成)</span>
+          <span class="arch-chip"><span class="chip-icon">&#128269;</span> OpenAI Embedding (语义检索)</span>
+          <span class="arch-chip"><span class="chip-icon">&#9889;</span> Claude Haiku (合规预检)</span>
+          <span class="arch-chip dim"><span class="chip-icon">&#128256;</span> LiteLLM 多模型网关 (Phase 2)</span>
         </div>
       </div>
 
@@ -1104,8 +1104,9 @@
     <div class="highlight-box amber" style="margin-top: 16px;">
       <h4>技术选型要点</h4>
       <ul>
-        <li><strong>AI 模型</strong>：灵活选型，可对接通义千问 / DeepSeek / OpenAI 等主流大模型，按需切换最优方案</li>
-        <li><strong>异步处理</strong>：任务队列处理 AI 耗时操作（打标/生成），避免用户等待超时</li>
+        <li><strong>AI 主力</strong>：Claude Sonnet (打标+文案+脚本) + OpenAI Embedding (语义检索)，MVP 仅需集成 2 个 API</li>
+        <li><strong>多模型路由</strong>：Phase 2 引入 LiteLLM 网关，支持 fallback 和成本优化（DeepSeek 低成本备选）</li>
+        <li><strong>异步 + 流式</strong>：任务队列处理 AI 耗时操作，SSE 流式输出缓解文案生成等待体感</li>
         <li><strong>存储 + CDN</strong>：云存储 + CDN 加速分发，覆盖全国 4000+ 门店</li>
       </ul>
     </div>
