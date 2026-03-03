@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eastman AI Platform · Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-primary: #060a12;
+  --bg-secondary: #0c1220;
+  --bg-card: #111c2e;
+  --bg-card-hover: #162438;
+  --bg-surface: #0e1726;
+  --text-primary: #e8edf5;
+  --text-secondary: #8d9bb5;
+  --text-muted: #4e5d78;
+  --accent-blue: #3b82f6;
+  --accent-cyan: #22d3ee;
+  --accent-green: #34d399;
+  --accent-purple: #a78bfa;
+  --accent-amber: #fbbf24;
+  --accent-red: #f87171;
+  --accent-pink: #f472b6;
+  --border: #1a2742;
+  --border-light: #243352;
+  --glow-blue: rgba(59, 130, 246, 0.15);
+  --glow-cyan: rgba(34, 211, 238, 0.12);
+  --font: 'Outfit', -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  font-family: var(--font);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+body {
+  background-image:
+    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(59,130,246,0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 80% 100%, rgba(34,211,238,0.03) 0%, transparent 70%);
+}
+
+/* === HEADER === */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  height: 64px;
+  background: rgba(6,10,18,0.85);
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--text-primary);
+}
+
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #fff;
+  box-shadow: 0 0 20px rgba(59,130,246,0.3);
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  padding: 4px;
+  border: 1px solid var(--border);
+}
+
+.tab {
+  padding: 8px 24px;
+  border-radius: 7px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+  border: none;
+  background: none;
+  font-family: var(--font);
+  white-space: nowrap;
+}
+
+.tab:hover { color: var(--text-secondary); }
+
+.tab.active {
+  background: var(--accent-blue);
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(59,130,246,0.35);
+}
+
+.header-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+/* === MAIN LAYOUT === */
+.main {
+  display: flex;
+  height: calc(100vh - 64px);
+  overflow: hidden;
+}
+
+.panel-left, .panel-right {
+  overflow-y: auto;
+  padding: 32px;
+}
+
+.panel-left::-webkit-scrollbar,
+.panel-right::-webkit-scrollbar { width: 4px; }
+.panel-left::-webkit-scrollbar-thumb,
+.panel-right::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+  border-radius: 4px;
+}
+
+/* === TAB 1: TAGGING === */
+.tag-left { width: 58%; border-right: 1px solid var(--border); }
+.tag-right { width: 42%; background: var(--bg-secondary); }
+
+.panel-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel-title::before {
+  content: '';
+  width: 3px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--accent-blue);
+}
+
+/* Image Grid */
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.image-card {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+  background: var(--bg-card);
+}
+
+.image-card:hover {
+  border-color: var(--accent-blue);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(59,130,246,0.12), 0 0 0 1px rgba(59,130,246,0.1);
+}
+
+.image-card.selected {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 1px var(--accent-cyan), 0 12px 40px rgba(34,211,238,0.15);
+}
+
+.image-card.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  background: var(--accent-cyan);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #000;
+  z-index: 3;
+}
+
+.image-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/10;
+  overflow: hidden;
+}
+
+.image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+
+.image-card:hover .image-wrap img {
+  transform: scale(1.05);
+}
+
+.image-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 50%, rgba(6,10,18,0.8) 100%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 16px;
+}
+
+.image-card:hover .image-overlay { opacity: 1; }
+
+.overlay-hint {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent-cyan);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: rgba(6,10,18,0.7);
+  border-radius: 20px;
+  border: 1px solid rgba(34,211,238,0.3);
+  backdrop-filter: blur(8px);
+}
+
+.image-info {
+  padding: 14px 16px;
+}
+
+.image-info h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.image-info p {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Scan animation */
+.scan-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+  box-shadow: 0 0 20px var(--accent-cyan), 0 0 60px rgba(34,211,238,0.3);
+  animation: scanDown 1.5s ease-in-out;
+  z-index: 5;
+  display: none;
+}
+
+.image-card.scanning .scan-line { display: block; }
+.image-card.scanning .image-wrap img {
+  filter: brightness(0.6) contrast(1.1);
+  transition: filter 0.3s;
+}
+
+@keyframes scanDown {
+  0% { top: 0; opacity: 1; }
+  90% { top: calc(100% - 3px); opacity: 1; }
+  100% { top: calc(100% - 3px); opacity: 0; }
+}
+
+/* === RIGHT PANEL: RESULTS === */
+.result-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  gap: 16px;
+  opacity: 0.5;
+}
+
+.result-empty-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: var(--bg-card);
+  border: 1px dashed var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+
+.result-empty p {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* Analysis loading */
+.analysis-loading {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 60px 0;
+}
+
+.analysis-loading.active { display: flex; }
+
+.loader-ring {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent-cyan);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loader-text {
+  font-size: 14px;
+  color: var(--accent-cyan);
+  font-weight: 500;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Tag results */
+.result-card {
+  display: none;
+}
+
+.result-card.active { display: block; }
+
+.result-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.result-thumb {
+  width: 72px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid var(--border-light);
+}
+
+.result-header-text h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.result-header-text p {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Tags */
+.tag-section {
+  margin-bottom: 20px;
+}
+
+.tag-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
+}
+
+.tag-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: tagIn 0.4s ease forwards;
+}
+
+.tag-chip.t-brand { background: rgba(59,130,246,0.12); color: var(--accent-blue); border: 1px solid rgba(59,130,246,0.2); }
+.tag-chip.t-series { background: rgba(167,139,250,0.12); color: var(--accent-purple); border: 1px solid rgba(167,139,250,0.2); }
+.tag-chip.t-position { background: rgba(34,211,238,0.12); color: var(--accent-cyan); border: 1px solid rgba(34,211,238,0.2); }
+.tag-chip.t-scene { background: rgba(52,211,153,0.12); color: var(--accent-green); border: 1px solid rgba(52,211,153,0.2); }
+.tag-chip.t-channel { background: rgba(251,191,36,0.12); color: var(--accent-amber); border: 1px solid rgba(251,191,36,0.2); }
+.tag-chip.t-car { background: rgba(244,114,182,0.12); color: var(--accent-pink); border: 1px solid rgba(244,114,182,0.2); }
+.tag-chip.t-type { background: rgba(248,113,113,0.12); color: var(--accent-red); border: 1px solid rgba(248,113,113,0.2); }
+
+@keyframes tagIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.tag-label {
+  font-size: 10px;
+  opacity: 0.6;
+  font-weight: 400;
+}
+
+/* Confidence */
+.confidence-bar {
+  margin: 20px 0;
+  padding: 16px;
+  background: var(--bg-card);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.conf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.conf-header span:first-child {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.conf-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent-green);
+}
+
+.conf-track {
+  height: 6px;
+  background: var(--bg-primary);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.conf-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan));
+  transition: width 1s cubic-bezier(0.4,0,0.2,1);
+  width: 0;
+}
+
+/* AI Reason */
+.ai-reason {
+  margin-top: 20px;
+  padding: 16px;
+  background: var(--bg-card);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.ai-reason-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-blue);
+}
+
+.ai-reason-header .arrow {
+  transition: transform 0.3s;
+  font-size: 12px;
+}
+
+.ai-reason.open .arrow { transform: rotate(180deg); }
+
+.ai-reason-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1), padding 0.3s;
+}
+
+.ai-reason.open .ai-reason-body {
+  max-height: 200px;
+  padding-top: 12px;
+}
+
+.ai-reason-body p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+/* Channel badges */
+.channel-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.channel-badge {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  background: rgba(251,191,36,0.08);
+  color: var(--accent-amber);
+  border: 1px solid rgba(251,191,36,0.15);
+}
+
+/* === TAB 2: CONTENT GENERATION === */
+.gen-view { display: none; }
+.gen-view.active { display: flex; }
+
+.gen-left { width: 35%; border-right: 1px solid var(--border); }
+.gen-right { width: 65%; background: var(--bg-secondary); }
+
+/* Product selector */
+.product-grid-sm {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.product-mini {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.product-mini:hover { border-color: var(--accent-blue); }
+
+.product-mini.selected {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 1px var(--accent-cyan);
+}
+
+.product-mini img {
+  width: 100%;
+  aspect-ratio: 16/10;
+  object-fit: cover;
+  display: block;
+}
+
+.product-mini-label {
+  padding: 8px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+}
+
+/* Selectors */
+.selector-group {
+  margin-bottom: 24px;
+}
+
+.selector-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.selector-btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sel-btn {
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font);
+}
+
+.sel-btn:hover { color: var(--text-secondary); border-color: var(--border-light); }
+
+.sel-btn.active {
+  background: rgba(59,130,246,0.12);
+  color: var(--accent-blue);
+  border-color: rgba(59,130,246,0.3);
+}
+
+/* Generate button */
+.gen-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent-blue), #6366f1);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.gen-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 30px rgba(59,130,246,0.35);
+}
+
+.gen-btn:active { transform: translateY(0); }
+
+.gen-btn.generating {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--accent-cyan);
+  pointer-events: none;
+}
+
+.gen-btn .sparkle { font-size: 18px; }
+
+/* Content display */
+.content-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  gap: 16px;
+  opacity: 0.4;
+}
+
+.content-empty-icon { font-size: 48px; margin-bottom: 8px; }
+.content-empty p { font-size: 14px; color: var(--text-muted); }
+
+.content-area { display: none; }
+.content-area.active { display: block; }
+
+.content-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.content-meta-chip {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.meta-product { background: rgba(59,130,246,0.1); color: var(--accent-blue); }
+.meta-channel { background: rgba(34,211,238,0.1); color: var(--accent-cyan); }
+.meta-style { background: rgba(167,139,250,0.1); color: var(--accent-purple); }
+
+/* Variant tabs */
+.variant-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  width: fit-content;
+}
+
+.var-tab {
+  padding: 6px 20px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  background: none;
+  font-family: var(--font);
+}
+
+.var-tab.active {
+  background: var(--accent-blue);
+  color: #fff;
+}
+
+/* Generated text */
+.gen-text {
+  font-size: 14px;
+  line-height: 2;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  min-height: 200px;
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  position: relative;
+}
+
+.gen-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 18px;
+  background: var(--accent-cyan);
+  animation: blink 0.6s step-end infinite;
+  vertical-align: text-bottom;
+  margin-left: 1px;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* Compliance */
+.compliance {
+  margin-top: 20px;
+  padding: 16px 20px;
+  border-radius: 10px;
+  display: none;
+}
+
+.compliance.active { display: block; }
+
+.compliance.pass {
+  background: rgba(52,211,153,0.06);
+  border: 1px solid rgba(52,211,153,0.15);
+}
+
+.compliance.warn {
+  background: rgba(251,191,36,0.06);
+  border: 1px solid rgba(251,191,36,0.15);
+}
+
+.compliance-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.compliance.pass .compliance-header { color: var(--accent-green); }
+.compliance.warn .compliance-header { color: var(--accent-amber); }
+
+.compliance-detail {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.compliance-detail .risk-word {
+  background: rgba(251,191,36,0.15);
+  color: var(--accent-amber);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: 500;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 1024px) {
+  .main { flex-direction: column; height: auto; }
+  .tag-left, .tag-right, .gen-left, .gen-right {
+    width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border);
+  }
+  .tag-right, .gen-right { min-height: 50vh; }
+  .header { padding: 0 20px; }
+  .tabs { display: flex; }
+  .tab { padding: 8px 16px; font-size: 13px; }
+  .header-meta { display: none; }
+}
+
+@media (max-width: 640px) {
+  .image-grid { grid-template-columns: 1fr; }
+  .panel-left, .panel-right { padding: 20px; }
+  .logo { font-size: 15px; }
+  .logo-icon { width: 28px; height: 28px; font-size: 14px; }
+}
+
+/* === HIDDEN UTILITY === */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">⬡</div>
+    <span>Eastman AI Platform</span>
+  </div>
+  <div class="tabs">
+    <button class="tab active" data-tab="tag" onclick="switchTab('tag')">AI 素材打标</button>
+    <button class="tab" data-tab="gen" onclick="switchTab('gen')">AI 内容生成</button>
+  </div>
+  <div class="header-meta">Demo v0.1 · Powered by Claude AI</div>
+</header>
+
+<!-- TAB 1: TAGGING -->
+<div class="main tag-view active" id="tagView">
+  <!-- Left: Images -->
+  <div class="panel-left tag-left">
+    <div class="panel-title">素材库</div>
+    <div class="image-grid">
+      <div class="image-card" data-idx="0" onclick="analyzeImage(0)">
+        <div class="image-wrap">
+          <img src="images/llumar-install.jpg" alt="龙膜施工实拍" loading="lazy">
+          <div class="scan-line"></div>
+          <div class="image-overlay">
+            <span class="overlay-hint">⊙ 点击 AI 分析</span>
+          </div>
+        </div>
+        <div class="image-info">
+          <h4>龙膜 · 门店施工实拍</h4>
+          <p>Tesla Model S · 贴膜效果展示</p>
+        </div>
+      </div>
+      <div class="image-card" data-idx="1" onclick="analyzeImage(1)">
+        <div class="image-wrap">
+          <img src="images/llumar-car-film.jpg" alt="龙膜产品展示" loading="lazy">
+          <div class="scan-line"></div>
+          <div class="image-overlay">
+            <span class="overlay-hint">⊙ 点击 AI 分析</span>
+          </div>
+        </div>
+        <div class="image-info">
+          <h4>龙膜 · 产品效果展示</h4>
+          <p>高端车型 · 全车贴膜方案</p>
+        </div>
+      </div>
+      <div class="image-card" data-idx="2" onclick="analyzeImage(2)">
+        <div class="image-wrap">
+          <img src="images/vkool-xir.jpg" alt="威固XIR" loading="lazy">
+          <div class="scan-line"></div>
+          <div class="image-overlay">
+            <span class="overlay-hint">⊙ 点击 AI 分析</span>
+          </div>
+        </div>
+        <div class="image-info">
+          <h4>威固 · XIR 高端系列</h4>
+          <p>XIR 技术 · 品牌官方素材</p>
+        </div>
+      </div>
+      <div class="image-card" data-idx="3" onclick="analyzeImage(3)">
+        <div class="image-wrap">
+          <img src="images/vkool-ctc.jpg" alt="威固新能源" loading="lazy">
+          <div class="scan-line"></div>
+          <div class="image-overlay">
+            <span class="overlay-hint">⊙ 点击 AI 分析</span>
+          </div>
+        </div>
+        <div class="image-info">
+          <h4>威固 · 新能源车窗膜</h4>
+          <p>CTC 组合 · 降温 15°C</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Results -->
+  <div class="panel-right tag-right" id="tagResults">
+    <div class="panel-title">AI 分析结果</div>
+    <div class="result-empty" id="tagEmpty">
+      <div class="result-empty-icon">🔍</div>
+      <p>点击左侧任意素材<br>启动 AI 智能分析</p>
+    </div>
+    <div class="analysis-loading" id="tagLoading">
+      <div class="loader-ring"></div>
+      <div class="loader-text">AI 分析中...</div>
+    </div>
+    <div class="result-card" id="tagResult"></div>
+  </div>
+</div>
+
+<!-- TAB 2: CONTENT GENERATION -->
+<div class="main gen-view" id="genView">
+  <!-- Left: Config -->
+  <div class="panel-left gen-left">
+    <div class="panel-title">生成配置</div>
+
+    <div class="selector-group">
+      <div class="selector-label">选择素材</div>
+      <div class="product-grid-sm">
+        <div class="product-mini" data-pidx="0" onclick="selectProduct(0)">
+          <img src="images/llumar-install.jpg" alt="">
+          <div class="product-mini-label">龙膜 · 畅悦70</div>
+        </div>
+        <div class="product-mini" data-pidx="1" onclick="selectProduct(1)">
+          <img src="images/llumar-car-film.jpg" alt="">
+          <div class="product-mini-label">龙膜 · 至尊AIR80</div>
+        </div>
+        <div class="product-mini" data-pidx="2" onclick="selectProduct(2)">
+          <img src="images/vkool-xir.jpg" alt="">
+          <div class="product-mini-label">威固 · XIR系列</div>
+        </div>
+        <div class="product-mini" data-pidx="3" onclick="selectProduct(3)">
+          <img src="images/vkool-ctc.jpg" alt="">
+          <div class="product-mini-label">威固 · CTC组合</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="selector-group">
+      <div class="selector-label">目标渠道</div>
+      <div class="selector-btns" id="channelBtns">
+        <button class="sel-btn" data-ch="xiaohongshu" onclick="selectChannel(this)">小红书</button>
+        <button class="sel-btn" data-ch="douyin" onclick="selectChannel(this)">抖音</button>
+        <button class="sel-btn" data-ch="wechat" onclick="selectChannel(this)">微信朋友圈</button>
+      </div>
+    </div>
+
+    <div class="selector-group">
+      <div class="selector-label">内容风格</div>
+      <div class="selector-btns" id="styleBtns">
+        <button class="sel-btn" data-st="zhongcao" onclick="selectStyle(this)">种草文</button>
+        <button class="sel-btn" data-st="ceping" onclick="selectStyle(this)">测评文</button>
+        <button class="sel-btn" data-st="promo" onclick="selectStyle(this)">促销活动</button>
+      </div>
+    </div>
+
+    <button class="gen-btn" id="genBtn" onclick="generateContent()">
+      <span class="sparkle">✦</span> AI 生成内容
+    </button>
+  </div>
+
+  <!-- Right: Content -->
+  <div class="panel-right gen-right">
+    <div class="panel-title">生成结果</div>
+    <div class="content-empty" id="genEmpty">
+      <div class="content-empty-icon">✦</div>
+      <p>选择素材、渠道和风格<br>点击生成按钮启动 AI 创作</p>
+    </div>
+    <div class="content-area" id="contentArea">
+      <div class="content-meta" id="contentMeta"></div>
+      <div class="variant-tabs">
+        <button class="var-tab active" onclick="switchVariant(0)">变体 A</button>
+        <button class="var-tab" onclick="switchVariant(1)">变体 B</button>
+      </div>
+      <div class="gen-text" id="genText"></div>
+      <div class="compliance" id="compliancePanel"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// === DATA ===
+var IMAGE_DATA = [
+  {
+    title: "龙膜 · 门店施工实拍",
+    src: "images/llumar-install.jpg",
+    tags: {
+      brand: "龙膜 LLumar", series: "畅悦系列", model: "畅悦70",
+      position: "前挡风玻璃", scene: "门店施工完成", contentType: "实拍照片",
+      channels: ["抖音", "小红书"], carModel: "Tesla Model S", confidence: 96
+    },
+    reason: "图片展示了一辆深色 Tesla Model S 在公路上行驶的效果照。车窗玻璃呈现明显的灰色调反射效果，判断为高透光率的前挡膜。根据龙膜产品线特征和色调匹配，最可能为畅悦70系列。适合用于展示贴膜后的整车外观效果。"
+  },
+  {
+    title: "龙膜 · 产品效果展示",
+    src: "images/llumar-car-film.jpg",
+    tags: {
+      brand: "龙膜 LLumar", series: "至尊系列", model: "AIR80",
+      position: "全车", scene: "产品效果展示", contentType: "营销素材",
+      channels: ["小红书", "微信朋友圈"], carModel: "Aston Martin Vanquish Zagato", confidence: 92
+    },
+    reason: "红色超跑顶视角拍摄，车窗深色贴膜清晰可见，属于高端产品线展示素材。深色车窗膜配合超跑定位，符合龙膜至尊系列高端形象。此类豪车素材适合在小红书和朋友圈做高端种草。"
+  },
+  {
+    title: "威固 · XIR 高端系列",
+    src: "images/vkool-xir.jpg",
+    tags: {
+      brand: "威固 V-KOOL", series: "XIR 系列", model: "VK70",
+      position: "前挡风", scene: "品牌广告", contentType: "官方宣传图",
+      channels: ["微信公众号", "抖音"], carModel: "概念超跑", confidence: 94
+    },
+    reason: "威固官方 XIR 系列宣传素材，画面包含品牌标识和'超过2500万高端车主选择'的文案。银色超跑展示高端定位，XIR 技术是威固核心卖点。标注有 VK、VP、X 三个产品系列。适合作为品牌宣传和技术科普类内容使用。"
+  },
+  {
+    title: "威固 · 新能源车窗膜",
+    src: "images/vkool-ctc.jpg",
+    tags: {
+      brand: "威固 V-KOOL", series: "新能源专用系列", model: "CTC 组合",
+      position: "全车玻璃", scene: "技术展示", contentType: "产品技术图",
+      channels: ["抖音", "小红书", "微信公众号"], carModel: "新能源轿车", confidence: 95
+    },
+    reason: "威固新能源车窗膜专题素材。画面核心信息：国检集团权威认证、降温高达15°C、'终极组合出动'。暗色调车头正面构图突出科技感。新能源车是当前汽车膜市场增长最快的细分领域。适合多渠道分发。"
+  }
+];
+
+var CONTENT_DATA = {
+  "0_xiaohongshu_zhongcao": {
+    variants: [
+      "姐妹们！今天终于去贴了心心念念的龙膜畅悦70！\n\n说真的，贴完之后开车的感受完全不一样了。之前大太阳天开车，方向盘烫手、车内闷热，空调开到最大也要等好久才凉。现在？上车就感觉温度降了一个档次。\n\n畅悦70最打动我的几个点：\n✅ 前挡70%透光率，不影响视野清晰度\n✅ 红外阻隔率超高，体感降温很明显\n✅ 夜间开车也不会觉得暗\n✅ 质保10年，龙膜大品牌售后放心\n\n贴膜师傅手艺也很赞，边角贴合度完美，看不出贴过膜。整个过程大概2小时，在店里喝杯咖啡就搞定了。\n\n总花费说一下：畅悦70前挡 + 侧后用的龙膜另一款，一共不到4000。感觉这个价位很值了。\n\n#龙膜 #汽车贴膜 #畅悦70 #特斯拉ModelS #隔热膜推荐",
+      "开了三年的 Model S 终于安排上龙膜了！选的畅悦70前挡，分享一下真实感受。\n\n先说结论：后悔没早贴。\n\n之前总觉得原车玻璃够用，直到夏天被晒怕了。畅悦70贴完最直观的变化：\n1️⃣ 车内温度明显降低，空调压力小了很多\n2️⃣ 仪表盘不再反光，开车更舒服\n3️⃣ 紫外线阻隔99%，手臂不会晒黑了\n\n技术党可以看看这组数据：\n- 可见光透过率：70%（前挡法规要求≥70%，刚好卡线）\n- 红外线阻隔率：>95%\n- 紫外线阻隔率：>99%\n\n施工过程很专业，龙膜授权店全程无尘车间操作。最后贴完效果很满意，从外面看不出来贴了膜，但坐进去体感差别很大。\n\n推荐给同样在纠结要不要贴膜的车友们。\n\n#龙膜畅悦 #前挡膜推荐 #Tesla贴膜 #汽车隔热膜"
+    ],
+    compliance: { status: "pass", text: "合规预检通过 · 未检测到广告法风险词" }
+  },
+  "2_douyin_zhongcao": {
+    variants: [
+      "【3秒看懂威固XIR有多猛】\n\n🎬 分镜1（0-5s）：烈日下两辆同款车并排\n旁白：同一个停车场，同一个大太阳\n\n🎬 分镜2（5-10s）：左边车内温度计55°C，右边38°C\n旁白：一辆没贴膜55度，贴了威固XIR的只有38度\n\n🎬 分镜3（10-18s）：博主坐进XIR车内，表情舒适\n旁白：体感差别就是——一个蒸桑拿，一个开空调。2500万高端车主的选择不是没道理的\n\n🎬 分镜4（18-25s）：展示威固质保卡和门店场景\n旁白：认准威固授权店，假一赔十\n\n🎬 分镜5（25-30s）：品牌露出 + 引导关注\n旁白：想知道你的车适合哪款？评论区告诉我车型\n\n#威固 #VKOOL #汽车贴膜 #隔热测试 #高端车膜",
+      "你的车膜能扛住几度高温？来看威固XIR的硬核实测👇\n\n上周深圳38度，实测数据：\n没贴膜的车：车内65°C 💀\n贴了威固XIR：车内39°C ❄️\n\n降温26度什么概念？就是别人上车先烫屁股，你上车直接出发。\n\n威固XIR核心技术：\n🔹 XIR红外智能阻隔\n🔹 99%紫外线隔绝\n🔹 原厂级透光率\n🔹 德国技术认证\n\n超过2500万高端车主选择威固，不是因为贵，是因为真的值。\n\n你的车贴了什么膜？评论区聊聊~\n\n#威固XIR #隔热膜测评 #深圳贴膜 #豪车标配"
+    ],
+    compliance: { status: "warn", text: "检测到 1 处风险", detail: "「假一赔十」— 建议修改为「正品保障」，绝对化承诺用语有广告法风险（广告法第28条）", word: "假一赔十" }
+  },
+  "1_wechat_promo": {
+    variants: [
+      "【限时福利】龙膜至尊系列全车贴膜套餐\n\n朋友们，好消息！本月龙膜授权店搞活动：\n\n至尊系列 AIR80 前挡 + 全车侧后\n原价 ¥6,800 → 活动价 ¥4,999\n再送价值 ¥500 的漆面保养券\n\n活动仅限本月，名额有限先到先得。\n需要的朋友私信我预约",
+      "终于等到龙膜搞活动了！\n\n至尊系列全车方案直降1800，还送漆面保养。之前一直犹豫的朋友可以冲了，这个价格真的很少见。\n\n我自己的车就是贴的龙膜至尊，三年了效果还跟新的一样，隔热、隔紫外线都很给力。\n\n有兴趣的扣1，我把活动链接发你。名额不多，月底截止。"
+    ],
+    compliance: { status: "pass", text: "合规预检通过 · 未检测到广告法风险词" }
+  },
+  "3_xiaohongshu_ceping": {
+    variants: [
+      "威固新能源车专用窗膜深度测评 | 降温15°C不是吹的\n\n作为一个贴过4次膜的老车主，这次给我的比亚迪汉EV贴威固新能源专用款，说说真实体验。\n\n📌 为什么新能源车更需要贴膜？\n新能源车的全景天幕是标配，但也意味着紫外线和热量直接照进来。而且新能源车的续航直接受空调影响——车内越热，空调功率越大，续航掉得越快。\n\n📌 威固CTC组合实测数据\n- 国检集团认证：红外阻隔率 97.2%\n- 实测车内温度：比未贴膜降低 12-15°C\n- 空调能耗：预计节省 15-20% 电量\n- 透光率：前挡72%，侧后15%\n\n📌 新能源车主最关心的三个问题\nQ1: 会影响ETC和信号吗？\nA: 不会，威固窗膜不含金属层，不干扰任何电子设备\n\nQ2: 全景天幕能贴吗？\nA: 可以，专门有天幕专用膜，贴完颜色均匀不起泡\n\nQ3: 质保多久？\nA: 威固质保10年，授权店贴膜可查正品验证\n\n📌 总结\n如果你开的是新能源车，强烈建议贴专用窗膜。不是为了好看，是为了续航和舒适性。威固CTC组合是目前我体验过最均衡的方案。\n\n#威固 #新能源贴膜 #比亚迪汉 #窗膜测评 #降温15度",
+      "新能源车主必看：为什么你的续航比别人少30km？\n\n答案可能是——你没贴窗膜。\n\n新能源车 = 大天幕 + 大电池 + 空调费电。夏天车内温度轻松飙到60°C以上，空调全力运转吃掉 20-30km 续航。\n\n威固新能源专用CTC组合怎么解决这个问题？\n\n降温效果：国检认证降温15°C\n红外阻隔：97.2%\n紫外线阻隔：99%+\n对续航的影响：减少空调能耗约15-20%\n\n换算一下：如果你的车续航500km，贴膜后夏天多跑30-50km。一年省下来的电费，贴膜成本两年回本。\n\n这个账，新能源车主一定要算明白。\n\n#新能源汽车 #威固窗膜 #续航焦虑 #贴膜省电 #CTC组合"
+    ],
+    compliance: { status: "pass", text: "合规预检通过 · 未检测到广告法风险词" }
+  }
+};
+
+// Add fallback content for missing combos
+var FALLBACK = {
+  variants: [
+    "【AI 正在为此组合生成内容...】\n\n当前 Demo 已预置 4 组精选内容示例：\n\n1. 龙膜畅悦70 × 小红书 × 种草文\n2. 威固XIR × 抖音 × 种草文\n3. 龙膜至尊 × 微信朋友圈 × 促销活动\n4. 威固CTC × 小红书 × 测评文\n\n请尝试以上组合查看完整的 AI 生成内容。\n\n在正式版本中，所有产品 × 渠道 × 风格的组合均可实时生成。",
+    "【更多内容组合即将上线】\n\n当前 Demo 版本收录了最具代表性的 4 组内容示例，覆盖了：\n\n✓ 两大品牌（龙膜 + 威固）\n✓ 三大渠道（小红书 / 抖音 / 微信）\n✓ 三种风格（种草 / 测评 / 促销）\n\n正式版平台将支持任意组合的实时 AI 内容生成。"
+  ],
+  compliance: { status: "pass", text: "Demo 模式 · 合规检测将在正式版中启用" }
+};
+
+// === STATE ===
+var currentTab = 'tag';
+var selectedImage = -1;
+var selectedProduct = -1;
+var selectedChannel = '';
+var selectedStyle = '';
+var currentVariant = 0;
+var isTyping = false;
+var typeTimer = null;
+
+// === TAB SWITCHING ===
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.toggle('active', t.dataset.tab === tab); });
+  document.getElementById('tagView').classList.toggle('active', tab === 'tag');
+  document.getElementById('tagView').style.display = tab === 'tag' ? 'flex' : 'none';
+  document.getElementById('genView').classList.toggle('active', tab === 'gen');
+  document.getElementById('genView').style.display = tab === 'gen' ? 'flex' : 'none';
+}
+
+// === TAGGING ===
+function analyzeImage(idx) {
+  if (selectedImage === idx) return;
+  selectedImage = idx;
+
+  // Update selection
+  document.querySelectorAll('.image-card').forEach(function(c, i) {
+    c.classList.toggle('selected', i === idx);
+    c.classList.remove('scanning');
+  });
+
+  // Start scan
+  var card = document.querySelector('.image-card[data-idx="' + idx + '"]');
+  card.classList.add('scanning');
+
+  // Show loading
+  document.getElementById('tagEmpty').style.display = 'none';
+  document.getElementById('tagResult').classList.remove('active');
+  var loader = document.getElementById('tagLoading');
+  loader.classList.add('active');
+
+  setTimeout(function() {
+    card.classList.remove('scanning');
+    loader.classList.remove('active');
+    showTagResult(idx);
+  }, 1600);
+}
+
+function showTagResult(idx) {
+  var data = IMAGE_DATA[idx];
+  var t = data.tags;
+  var delay = 0;
+
+  var html = '<div class="result-header">' +
+    '<img src="' + data.src + '" class="result-thumb" alt="">' +
+    '<div class="result-header-text"><h3>' + data.title + '</h3>' +
+    '<p>' + t.carModel + ' · ' + t.contentType + '</p></div></div>';
+
+  html += '<div class="tag-section"><div class="tag-section-title">识别标签</div><div class="tag-grid">';
+
+  var tags = [
+    { label: '品牌', value: t.brand, cls: 't-brand' },
+    { label: '系列', value: t.series, cls: 't-series' },
+    { label: '型号', value: t.model, cls: 't-series' },
+    { label: '部位', value: t.position, cls: 't-position' },
+    { label: '场景', value: t.scene, cls: 't-scene' },
+    { label: '类型', value: t.contentType, cls: 't-type' },
+    { label: '车型', value: t.carModel, cls: 't-car' }
+  ];
+
+  tags.forEach(function(tag, i) {
+    html += '<span class="tag-chip ' + tag.cls + '" style="animation-delay:' + (i * 0.08) + 's">' +
+      '<span class="tag-label">' + tag.label + '</span> ' + tag.value + '</span>';
+  });
+
+  html += '</div></div>';
+
+  // Channels
+  html += '<div class="tag-section"><div class="tag-section-title">适用渠道</div><div class="channel-row">';
+  t.channels.forEach(function(ch) {
+    html += '<span class="channel-badge">' + ch + '</span>';
+  });
+  html += '</div></div>';
+
+  // Confidence
+  html += '<div class="confidence-bar"><div class="conf-header">' +
+    '<span>AI 置信度</span><span class="conf-value">' + t.confidence + '%</span></div>' +
+    '<div class="conf-track"><div class="conf-fill" id="confFill"></div></div></div>';
+
+  // AI Reason
+  html += '<div class="ai-reason" onclick="this.classList.toggle(\'open\')">' +
+    '<div class="ai-reason-header"><span>🤖 AI 分析理由</span><span class="arrow">▼</span></div>' +
+    '<div class="ai-reason-body"><p>' + data.reason + '</p></div></div>';
+
+  var resultEl = document.getElementById('tagResult');
+  resultEl.innerHTML = html;
+  resultEl.classList.add('active');
+
+  // Animate confidence bar
+  setTimeout(function() {
+    var fill = document.getElementById('confFill');
+    if (fill) fill.style.width = t.confidence + '%';
+  }, 100);
+}
+
+// === CONTENT GENERATION ===
+function selectProduct(idx) {
+  selectedProduct = idx;
+  document.querySelectorAll('.product-mini').forEach(function(p, i) {
+    p.classList.toggle('selected', i === idx);
+  });
+}
+
+function selectChannel(btn) {
+  selectedChannel = btn.dataset.ch;
+  document.querySelectorAll('#channelBtns .sel-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+}
+
+function selectStyle(btn) {
+  selectedStyle = btn.dataset.st;
+  document.querySelectorAll('#styleBtns .sel-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+}
+
+function generateContent() {
+  if (selectedProduct < 0 || !selectedChannel || !selectedStyle || isTyping) return;
+
+  isTyping = true;
+  currentVariant = 0;
+
+  var btn = document.getElementById('genBtn');
+  btn.classList.add('generating');
+  btn.innerHTML = '<div class="loader-ring" style="width:20px;height:20px;border-width:2px;"></div> 生成中...';
+
+  document.getElementById('genEmpty').style.display = 'none';
+
+  // Show content area with meta
+  var channelNames = { xiaohongshu: '小红书', douyin: '抖音', wechat: '微信朋友圈' };
+  var styleNames = { zhongcao: '种草文', ceping: '测评文', promo: '促销活动' };
+
+  var meta = document.getElementById('contentMeta');
+  meta.innerHTML = '<span class="content-meta-chip meta-product">' + IMAGE_DATA[selectedProduct].title + '</span>' +
+    '<span class="content-meta-chip meta-channel">' + channelNames[selectedChannel] + '</span>' +
+    '<span class="content-meta-chip meta-style">' + styleNames[selectedStyle] + '</span>';
+
+  // Reset variant tabs
+  document.querySelectorAll('.var-tab').forEach(function(t, i) { t.classList.toggle('active', i === 0); });
+
+  var area = document.getElementById('contentArea');
+  area.classList.add('active');
+
+  // Lookup content
+  var key = selectedProduct + '_' + selectedChannel + '_' + selectedStyle;
+  var content = CONTENT_DATA[key] || FALLBACK;
+
+  setTimeout(function() {
+    btn.classList.remove('generating');
+    btn.innerHTML = '<span class="sparkle">✦</span> AI 生成内容';
+    typeContent(content.variants[0], content, 0);
+  }, 1200);
+}
+
+function typeContent(text, contentObj, variantIdx) {
+  var el = document.getElementById('genText');
+  el.innerHTML = '';
+  var i = 0;
+
+  // Hide compliance during typing
+  document.getElementById('compliancePanel').classList.remove('active');
+
+  if (typeTimer) cancelAnimationFrame(typeTimer);
+
+  var lastTime = 0;
+  function typeStep(ts) {
+    if (ts - lastTime < 12) { typeTimer = requestAnimationFrame(typeStep); return; }
+    lastTime = ts;
+
+    if (i < text.length) {
+      // Add characters in small batches for speed
+      var chunk = text.substring(i, i + 2);
+      el.textContent += chunk;
+      i += 2;
+      el.innerHTML = el.textContent + '<span class="gen-cursor"></span>';
+      el.scrollTop = el.scrollHeight;
+      typeTimer = requestAnimationFrame(typeStep);
+    } else {
+      el.innerHTML = el.textContent;
+      isTyping = false;
+      // store contentObj for variant switching
+      el.dataset.contentKey = JSON.stringify(contentObj);
+      el.dataset.variantIdx = variantIdx;
+      showCompliance(contentObj.compliance);
+    }
+  }
+
+  isTyping = true;
+  typeTimer = requestAnimationFrame(typeStep);
+}
+
+function switchVariant(idx) {
+  currentVariant = idx;
+  document.querySelectorAll('.var-tab').forEach(function(t, i) { t.classList.toggle('active', i === idx); });
+
+  var el = document.getElementById('genText');
+  try {
+    var contentObj = JSON.parse(el.dataset.contentKey);
+    if (contentObj && contentObj.variants[idx]) {
+      if (typeTimer) cancelAnimationFrame(typeTimer);
+      typeContent(contentObj.variants[idx], contentObj, idx);
+    }
+  } catch(e) {}
+}
+
+function showCompliance(comp) {
+  var panel = document.getElementById('compliancePanel');
+  panel.className = 'compliance active ' + (comp.status === 'warn' ? 'warn' : 'pass');
+
+  var icon = comp.status === 'warn' ? '⚠' : '✓';
+  var html = '<div class="compliance-header">' + icon + ' ' + comp.text + '</div>';
+
+  if (comp.detail) {
+    html += '<div class="compliance-detail">';
+    if (comp.word) {
+      html += '<span class="risk-word">' + comp.word + '</span> — ' + comp.detail;
+    } else {
+      html += comp.detail;
+    }
+    html += '</div>';
+  }
+
+  panel.innerHTML = html;
+}
+
+// Init
+switchTab('tag');
+</script>
+</body>
+</html>
